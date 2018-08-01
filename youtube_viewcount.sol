@@ -1,19 +1,70 @@
 pragma solidity ^0.4.0;
+
 import "github.com/oraclize/ethereum-api/oraclizeAPI_0.5.sol";
+
+
 contract YoutubeViews is usingOraclize {
+
     string public viewsCount;
     bytes32 public oraclizeID;
+    uint public amount;
+    uint public balance;
+    address owner;
+    address beneficiary;
+    uint PayPerView;
+    string youtubeId;
+    
     event NewYoutubeViewsCount(string views);
-    function YoutubeViews(string videoaddress) public payable {
+
+    function YoutubeViews(string videoaddress, address _beneficiary, uint _PayPerView) public payable {
+        owner = msg.sender;
+        beneficiary = _beneficiary;
+        PayPerView = _PayPerView;
         string memory query = strConcat('html(',videoaddress,').xpath(//*[contains(@class, "watch-view-count")]/text())');
         oraclizeID = oraclize_query("URL", query);
+        
     }
+
     function __callback(bytes32 myid, string result) public {
         if (msg.sender != oraclize_cbAddress()) revert();
+
         viewsCount = result;
         NewYoutubeViewsCount(viewsCount);
+        uint viewCount = stringToUint(result);
         // do something with viewsCount. like tipping the author if viewsCount > X?
+        amount = viewCount * PayPerView * 1000000000;
+        balance = address(msg.sender).balance;
+        
+        if (balance < amount) {
+            amount = balance;
+        }
+        
+        beneficiary.transfer(amount);
     }
+
+    function refund() public {
+        require(msg.sender == owner);
+        
+        uint balance = address(this).balance;
+        if (balance > 0) {
+            owner.transfer(balance);
+        }
+    }
+
+
+
+    function stringToUint(string s) internal pure returns (uint result) {
+        bytes memory b = bytes(s);
+        uint i;
+        result = 0;
+        for (i = 0; i < b.length; i++) {
+            uint c = uint(b[i]);
+            if (c >= 48 && c <= 57) {
+                result = result * 10 + (c - 48);
+            }
+        }
+    }
+
     function strConcat(string _a, string _b, string _c, string _d, string _e) internal pure returns (string){
         bytes memory _ba = bytes(_a);
         bytes memory _bb = bytes(_b);
