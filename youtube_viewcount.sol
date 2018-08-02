@@ -38,9 +38,12 @@ contract YoutubeViews is usingOraclize {
         if (balance < amount) {
             amount = balance;
         }
-        
+    }
+    
+    function () public payable {
         beneficiary.transfer(amount);
     }
+    
 
     function refund() public {
         require(msg.sender == owner);
