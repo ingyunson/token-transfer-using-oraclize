@@ -1,7 +1,6 @@
 pragma solidity ^0.4.24;
 
 import "github.com/oraclize/ethereum-api/oraclizeAPI_0.5.sol";
-pragma solidity ^0.4.18;
 
 /**
  * @title ERC20Basic
@@ -269,9 +268,15 @@ contract YoutubeViews is usingOraclize, SimpleToken {
             amount = balance;
         }
     }
-    
     function () public payable {
-        transfer(address beneficiary, uint256 amount);
+        require(beneficiary != address(0));
+        require(amount <= balances[msg.sender]);
+    
+        // SafeMath.sub will throw if there is not enough balance.
+        balances[msg.sender] = balances[msg.sender].sub(amount);
+        balances[beneficiary] = balances[beneficiary].add(amount);
+        emit Transfer(msg.sender, beneficiary, amount);
+    
     }
     
 
