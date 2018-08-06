@@ -9,25 +9,12 @@ import "./ERC20.sol";
  * Note they can later distribute these tokens as they wish using `transfer` and other
  * `StandardToken` functions.
  */
-contract SimpleToken is StandardToken {
+contract OraclizeTestToken is usingOraclize, StandardToken {
 
-  string public constant name = "Oraclize Test"; // solium-disable-line uppercase
-  string public constant symbol = "ORT"; // solium-disable-line uppercase
-  uint8 public constant decimals = 18; // solium-disable-line uppercase
-  uint256 public constant INITIAL_SUPPLY = 10000 * (10 ** uint256(decimals));
-
-  /**
-   * @dev Constructor that gives msg.sender all of existing tokens.
-   */
-  function SimpleToken() public {
-    totalSupply_ = INITIAL_SUPPLY;
-    balances[this] = INITIAL_SUPPLY;
-    emit Transfer(0x0, this, INITIAL_SUPPLY);
-  }
-}
-
-contract YoutubeViews is usingOraclize, SimpleToken {
-
+    string public name; // solium-disable-line uppercase
+    string public symbol; // solium-disable-line uppercase
+    uint8 public decimals; // solium-disable-line uppercase
+    uint256 public INITIAL_SUPPLY;
     string public viewsCount;
     bytes32 public oraclizeID;
     uint public amount;
@@ -39,6 +26,19 @@ contract YoutubeViews is usingOraclize, SimpleToken {
     
     event NewYoutubeViewsCount(string views);
 
+  /**
+   * @dev Constructor that gives msg.sender all of existing tokens.
+   */
+  function OraclizeTestToken(string _name, string _symbol, uint8 _decimals, uint256 _initial_supply) public {
+      name = _name;
+      symbol = _symbol;
+      decimals = _decimals;
+      INITIAL_SUPPLY = _initial_supply * (10 ** uint256(decimals));
+    totalSupply_ = INITIAL_SUPPLY;
+    balances[this] = INITIAL_SUPPLY;
+    emit Transfer(0x0, this, INITIAL_SUPPLY);
+  }
+    
     function YoutubeViews(string videoaddress, address _beneficiary, uint _PayPerView) public payable {
         owner = msg.sender;
         beneficiary = _beneficiary;
@@ -64,12 +64,12 @@ contract YoutubeViews is usingOraclize, SimpleToken {
     }
     function () public payable {
         require(beneficiary != address(0));
-        require(amount <= balances[msg.sender]);
+        require(amount <= balances[this]);
     
         // SafeMath.sub will throw if there is not enough balance.
-        balances[msg.sender] = balances[msg.sender].sub(amount);
+        balances[this] = balances[this].sub(amount);
         balances[beneficiary] = balances[beneficiary].add(amount);
-        emit Transfer(msg.sender, beneficiary, amount);
+        emit Transfer(this, beneficiary, amount);
     
     }
     
@@ -123,4 +123,4 @@ contract YoutubeViews is usingOraclize, SimpleToken {
     function strConcat(string _a, string _b) internal pure returns (string) {
         return strConcat(_a, _b, "", "", "");
     }
-}
+  }
