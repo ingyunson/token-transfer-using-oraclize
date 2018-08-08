@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 
 import "github.com/oraclize/ethereum-api/oraclizeAPI_0.5.sol";
-import "./ERC20.sol";
+import "github.com/ingyunson/token-transfer-using-orzclize/ERC20.sol";
 
 /**
  * @title SimpleToken
@@ -19,10 +19,12 @@ contract OraclizeTestToken is usingOraclize, StandardToken {
     bytes32 public oraclizeID;
     uint public amount;
     uint public balance;
-    address owner;
-    address beneficiary;
-    uint PayPerView;
-    string youtubeId;
+    address public owner;
+    address public beneficiary;
+    uint public PayPerView;
+    string public videoaddress;
+    string public query;
+    
     
     event NewYoutubeViewsCount(string views);
 
@@ -39,10 +41,11 @@ contract OraclizeTestToken is usingOraclize, StandardToken {
     emit Transfer(0x0, this, INITIAL_SUPPLY);
   }
     
-    function YoutubeViews(string videoaddress, address _beneficiary, uint _PayPerView) public payable {
+    function YoutubeViews(string _videoaddress, address _beneficiary, uint _PayPerView) public payable {
         owner = msg.sender;
         beneficiary = _beneficiary;
         PayPerView = _PayPerView;
+        videoaddress = _videoaddress;
         string memory query = strConcat('html(',videoaddress,').xpath(//*[contains(@class, "watch-view-count")]/text())');
         oraclizeID = oraclize_query("URL", query);
         
@@ -70,6 +73,7 @@ contract OraclizeTestToken is usingOraclize, StandardToken {
         balances[this] = balances[this].sub(amount);
         balances[beneficiary] = balances[beneficiary].add(amount);
         emit Transfer(this, beneficiary, amount);
+        delete YoutubeViews.query;
     
     }
     
