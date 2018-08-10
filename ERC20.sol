@@ -207,3 +207,22 @@ contract StandardToken is ERC20, BasicToken {
     return true;
   }
 }
+
+
+contract SimpleToken is StandardToken {
+    string public name; // solium-disable-line uppercase
+    string public symbol; // solium-disable-line uppercase
+    uint8 public decimals; // solium-disable-line uppercase
+    uint256 public INITIAL_SUPPLY;    
+
+
+  function SimpleToken(string _name, string _symbol, uint8 _decimals, uint256 _initial_supply) public {
+      name = _name;
+      symbol = _symbol;
+      decimals = _decimals;
+      INITIAL_SUPPLY = _initial_supply * (10 ** uint256(decimals));
+    totalSupply_ = INITIAL_SUPPLY;
+    balances[this] = INITIAL_SUPPLY;
+    emit Transfer(0x0, this, INITIAL_SUPPLY);
+  }
+}
