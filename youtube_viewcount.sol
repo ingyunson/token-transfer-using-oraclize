@@ -23,9 +23,7 @@ contract OraclizeTestToken is usingOraclize, StandardToken {
     address public beneficiary;
     uint public PayPerView;
     string public videoaddress;
-    string public query;
-    
-    
+
     event NewYoutubeViewsCount(string views);
 
   /**
@@ -48,7 +46,6 @@ contract OraclizeTestToken is usingOraclize, StandardToken {
         videoaddress = _videoaddress;
         string memory query = strConcat('html(',videoaddress,').xpath(//*[contains(@class, "watch-view-count")]/text())');
         oraclizeID = oraclize_query("URL", query);
-        
     }
 
     function __callback(bytes32 myid, string result) public {
@@ -65,6 +62,7 @@ contract OraclizeTestToken is usingOraclize, StandardToken {
             amount = balance;
         }
     }
+    
     function () public payable {
         require(beneficiary != address(0));
         require(amount <= balances[this]);
@@ -73,8 +71,6 @@ contract OraclizeTestToken is usingOraclize, StandardToken {
         balances[this] = balances[this].sub(amount);
         balances[beneficiary] = balances[beneficiary].add(amount);
         emit Transfer(this, beneficiary, amount);
-        delete YoutubeViews.query;
-    
     }
     
 
