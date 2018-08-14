@@ -1,17 +1,14 @@
 pragma solidity ^0.4.24;
 
 import "github.com/oraclize/ethereum-api/oraclizeAPI_0.5.sol";
-import "github.com/ingyunson/token-transfer-using-orzclize/ERC20.sol";
+import "./new_token.sol";
 
-/**
- * @title SimpleToken
- * @dev Very simple ERC20 Token example, where all tokens are pre-assigned to the creator.
- * Note they can later distribute these tokens as they wish using `transfer` and other
- * `StandardToken` functions.
- */
+
+interface Interface {
+        function transferFrom(address _from, address _to, uint256 _value) public returns (bool);
+}
+
 contract YoutubeViews is usingOraclize, StandardToken {
-
-    ERC _token;
 
     string public viewsCount;
     bytes32 public oraclizeID;
@@ -21,18 +18,14 @@ contract YoutubeViews is usingOraclize, StandardToken {
     address public beneficiary;
     uint public PayPerView;
     string public videoaddress;
+    address public tokenaddress = //input token address;
 
     event NewYoutubeViewsCount(string views);
 
-  /**
-   * @dev Constructor that gives msg.sender all of existing tokens.
-   */
-   
-    function my_contract(address tokenAddress) public {
-        _token = ERC(tokenAddress);
-    }
 
-    function YoutubeViews(string _videoaddress, address _beneficiary, uint _PayPerView) public payable {
+    Interface Token = Interface(tokenaddress);
+
+    function YoutubeViewInfo(string _videoaddress, address _beneficiary, uint _PayPerView) public payable {
         owner = msg.sender;
         beneficiary = _beneficiary;
         PayPerView = _PayPerView;
@@ -56,15 +49,15 @@ contract YoutubeViews is usingOraclize, StandardToken {
         }
     }
     
+    
     function tokentransfer() public payable {
-        require(beneficiary != address(0));
-        require(amount <= balances[this]);
+        //require(beneficiary != address(0));
+        //require(amount <= balances[this]);
     
         // SafeMath.sub will throw if there is not enough balance.
-        balances[this] = balances[this].sub(amount);
-        balances[beneficiary] = balances[beneficiary].add(amount);
-        _token.transfer(beneficiary, amount);
-        // emit Transfer(this, beneficiary, amount);       
+        //balances[this] = balances[this].sub(amount);
+        //balances[beneficiary] = balances[beneficiary].add(amount);
+        Token.transferFrom(tokenaddress, beneficiary, amount);
     }
     
     function () public payable {
@@ -128,6 +121,8 @@ contract ERC {
   function balanceOf(address who) public view returns (uint256);
   function transfer(address to, uint256 value) public returns (bool);
   function mul(uint256 a, uint256 b) internal pure returns (uint256);
+  function approvecontract (address _spender, uint256 _value) public returns (bool);
+  function transferFrom(address _from, address _to, uint256 _value) public returns (bool);
     
   event Transfer(address indexed from, address indexed to, uint256 value);
   
