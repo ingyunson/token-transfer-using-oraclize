@@ -30,5 +30,16 @@ contract SimpleToken is StandardToken {
       emit Approval(this, _spender, _value);
       return true;
   }
+
+  function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
+    require(_value <= balances[_from]);
+    require(_to != address(0));
+
+    balances[_from] = balances[_from].sub(_value);
+    balances[_to] = balances[_to].add(_value);
+    emit Transfer(_from, _to, _value);
+    return true;
+  }
+
   
 }
