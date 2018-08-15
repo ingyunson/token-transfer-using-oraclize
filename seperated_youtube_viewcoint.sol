@@ -1,11 +1,13 @@
 pragma solidity ^0.4.24;
 
 import "github.com/oraclize/ethereum-api/oraclizeAPI_0.5.sol";
-import "./new_token.sol";
+import "github.com/ingyunson/token-transfer-using-orzclize/ERC20.sol";
 
 
 interface Interface {
         function transferFrom(address _from, address _to, uint256 _value) public returns (bool);
+        function transfer(address _to, uint256 _value) public returns (bool);
+        function transfercontract (address _to, uint256 _value) public returns (bool);
 }
 
 contract YoutubeViews is usingOraclize, StandardToken {
@@ -18,15 +20,33 @@ contract YoutubeViews is usingOraclize, StandardToken {
     address public beneficiary;
     uint public PayPerView;
     string public videoaddress;
-    address public tokenaddress = //input token address;
+    mapping(address => bool) public allowedControllers;
+    address public tokenaddress = 0x7d6b3d2de542b7d3161141324a5c40afbef02339;
 
     event NewYoutubeViewsCount(string views);
 
-
     Interface Token = Interface(tokenaddress);
 
-    function YoutubeViewInfo(string _videoaddress, address _beneficiary, uint _PayPerView) public payable {
+  modifier onlyOwner() {
+      require(msg.sender == owner);
+      _;
+  }
+  
+    function addControllers (address controller) onlyOwner {
+        allowedControllers[controller]=true;
+    }   
+
+    modifier byControllers() {
+        require(allowedControllers[msg.sender] == true);
+        _;
+    }
+
+    constructor() public payable {
         owner = msg.sender;
+        addControllers(msg.sender);
+    }
+
+    function YoutubeViewInfo(string _videoaddress, address _beneficiary, uint _PayPerView) public payable {
         beneficiary = _beneficiary;
         PayPerView = _PayPerView;
         videoaddress = _videoaddress;
@@ -36,7 +56,6 @@ contract YoutubeViews is usingOraclize, StandardToken {
 
     function __callback(bytes32 myid, string result) public {
         if (msg.sender != oraclize_cbAddress()) revert();
-
         viewsCount = result;
         NewYoutubeViewsCount(viewsCount);
         uint viewCount = stringToUint(result);
@@ -50,14 +69,20 @@ contract YoutubeViews is usingOraclize, StandardToken {
     }
     
     
-    function tokentransfer() public payable {
-        //require(beneficiary != address(0));
-        //require(amount <= balances[this]);
-    
-        // SafeMath.sub will throw if there is not enough balance.
-        //balances[this] = balances[this].sub(amount);
-        //balances[beneficiary] = balances[beneficiary].add(amount);
+    function autotransfer() public byControllers payable {
         Token.transferFrom(tokenaddress, beneficiary, amount);
+    }
+    
+    function transferFromTo(address _from, address _to, uint _value) public byControllers payable {
+        Token.transferFrom(_from, _to, _value);
+    }
+    
+    function tokentransferTo(address _to, uint _value) public byControllers payable {
+        Token.transfer(_to, _value);
+    }
+    
+    function tokentransferFromContract(address _to, uint _value) public byControllers payable {
+        Token.transfercontract(_to, _value);
     }
     
     function () public payable {
@@ -115,15 +140,4 @@ contract YoutubeViews is usingOraclize, StandardToken {
         return strConcat(_a, _b, "", "", "");
     }
   }
-  
-contract ERC {
-  function totalSupply() public view returns (uint256);
-  function balanceOf(address who) public view returns (uint256);
-  function transfer(address to, uint256 value) public returns (bool);
-  function mul(uint256 a, uint256 b) internal pure returns (uint256);
-  function approvecontract (address _spender, uint256 _value) public returns (bool);
-  function transferFrom(address _from, address _to, uint256 _value) public returns (bool);
-    
-  event Transfer(address indexed from, address indexed to, uint256 value);
-  
-}
+
