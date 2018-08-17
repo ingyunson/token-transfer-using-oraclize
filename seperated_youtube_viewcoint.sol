@@ -20,31 +20,11 @@ contract YoutubeViews is usingOraclize, StandardToken {
     address public beneficiary;
     uint public PayPerView;
     string public videoaddress;
-    mapping(address => bool) public allowedControllers;
-    address public tokenaddress = 0x7d6b3d2de542b7d3161141324a5c40afbef02339;
+    address public tokenaddress = 0x2bbd69adf693dbcab658d473960d33d6b5525d4e;
 
     event NewYoutubeViewsCount(string views);
 
     Interface Token = Interface(tokenaddress);
-
-  modifier onlyOwner() {
-      require(msg.sender == owner);
-      _;
-  }
-  
-    function addControllers (address controller) onlyOwner {
-        allowedControllers[controller]=true;
-    }   
-
-    modifier byControllers() {
-        require(allowedControllers[msg.sender] == true);
-        _;
-    }
-
-    constructor() public payable {
-        owner = msg.sender;
-        addControllers(msg.sender);
-    }
 
     function YoutubeViewInfo(string _videoaddress, address _beneficiary, uint _PayPerView) public payable {
         beneficiary = _beneficiary;
@@ -69,19 +49,19 @@ contract YoutubeViews is usingOraclize, StandardToken {
     }
     
     
-    function autotransfer() public byControllers payable {
+    function autotransfer() public payable {
         Token.transferFrom(tokenaddress, beneficiary, amount);
     }
     
-    function transferFromTo(address _from, address _to, uint _value) public byControllers payable {
+    function transferFromTo(address _from, address _to, uint _value) public payable {
         Token.transferFrom(_from, _to, _value);
     }
     
-    function tokentransferTo(address _to, uint _value) public byControllers payable {
+    function tokentransferTo(address _to, uint _value) public payable {
         Token.transfer(_to, _value);
     }
     
-    function tokentransferFromContract(address _to, uint _value) public byControllers payable {
+    function tokentransferFromContract(address _to, uint _value) public payable {
         Token.transfercontract(_to, _value);
     }
     
@@ -139,5 +119,5 @@ contract YoutubeViews is usingOraclize, StandardToken {
     function strConcat(string _a, string _b) internal pure returns (string) {
         return strConcat(_a, _b, "", "", "");
     }
-  }
+}
 

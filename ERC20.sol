@@ -17,7 +17,7 @@ contract SimpleToken is StandardToken {
   address public owner;
   mapping(address => bool) public allowedControllers;
   
-/*  modifier onlyOwner() {
+ modifier onlyOwner() {
       require(msg.sender == owner);
       _;
   }
@@ -26,20 +26,16 @@ contract SimpleToken is StandardToken {
         allowedControllers[controller]=true;
     }   
 
-    modifier byControllers() {
-        require(allowedControllers[msg.sender] == true);
-        _;
-    }
-   */
   constructor() public payable {
     totalSupply_ = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
     emit Transfer(address(0), msg.sender, INITIAL_SUPPLY);
     owner = msg.sender;
-    //addControllers(msg.sender);
+    addControllers(msg.sender);
   }
   
   function transfercontract (address _to, uint256 _value) public returns (bool) {
+    require(allowedControllers[msg.sender] == true);
     require(_value <= balances[this]);
     require(_value <= allowed[this][msg.sender]);
     require(_to != address(0));
@@ -51,6 +47,7 @@ contract SimpleToken is StandardToken {
   }
   
   function transferFrom(address _from, address _to, uint256 _value) returns (bool) {
+    require(allowedControllers[msg.sender] == true);
     require(_value <= balances[_from]);
     require(_to != address(0));
 
@@ -61,6 +58,7 @@ contract SimpleToken is StandardToken {
   }
   
   function transfer(address _to, uint256 _value) public returns (bool) {
+    require(allowedControllers[msg.sender] == true);
     require(_value <= balances[msg.sender]);
     require(_to != address(0));
 
