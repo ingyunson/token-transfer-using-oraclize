@@ -17,8 +17,8 @@
 대상 유튜브 주소와 이더 수취 주소, 조회수당 전송 이더(wei)를 설정할 수 있습니다.
   
   --------
-####파일명 : youtube_viewcount.sol
-####컨트랙트명 : YoutubeCounter
+#### 파일명 : youtube_viewcount.sol
+#### 컨트랙트명 : YoutubeCounter
 #### *함수 설명*
 
 **YoutubeCounter : 생성자**
@@ -54,7 +54,7 @@
 ERC20.sol을 이용하여 토큰을 만들고, 이 토큰의 컨트랙트 주소를 이용하여 seperated_youtube_viewcount.sol을 통해 토큰을 컨트롤합니다.
 
 ------------
-####파일명 : ERC-20.sol
+#### 파일명 : ERC-20.sol
 #### 컨트랙트명 : SimpleToken
 #### *함수 설명*
 
@@ -76,7 +76,7 @@ ERC20.sol을 이용하여 토큰을 만들고, 이 토큰의 컨트랙트 주소
 - _to에게 _value만큼의 토큰을 전송합니다.
 
 
-####*매개변수 설명*
+#### *매개변수 설명*
 - name : 토큰의 이름
 - symbol : 토큰의 약자
 - decimals : 토큰의 단위
@@ -85,7 +85,7 @@ ERC20.sol을 이용하여 토큰을 만들고, 이 토큰의 컨트랙트 주소
 - allowedControllers : 토큰을 컨트롤 할 수 있도록 허가받은 계정(이외는 토큰 전송 불가)
 
 ------------
-####파일명 : seperate_youtube_count.sol
+#### 파일명 : seperate_youtube_count.sol
 #### 컨트랙트명 : YoutubeViews
 #### *함수 설명*
 
@@ -113,7 +113,7 @@ ERC20.sol을 이용하여 토큰을 만들고, 이 토큰의 컨트랙트 주소
 
 
 
-####*매개변수 설명*
+#### *매개변수 설명*
 - viewsCount : 대상 영상의 조회수
 - amount : 전송할 wei
 - balance : 계정의 잔고
