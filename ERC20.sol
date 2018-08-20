@@ -27,43 +27,40 @@ contract SimpleToken is StandardToken {
     }   
 
   constructor() public payable {
-    totalSupply_ = INITIAL_SUPPLY;
-    balances[msg.sender] = INITIAL_SUPPLY;
-    emit Transfer(address(0), msg.sender, INITIAL_SUPPLY);
+    _mint(msg.sender, INITIAL_SUPPLY);
     owner = msg.sender;
     addControllers(msg.sender);
   }
   
   function transfercontract (address _to, uint256 _value) public returns (bool) {
     require(allowedControllers[msg.sender] == true);
-    require(_value <= balances[this]);
-    require(_value <= allowed[this][msg.sender]);
+    require(_value <= balanceOf(this));
     require(_to != address(0));
 
-    balances[this] = balances[this].sub(_value);
-    balances[_to] = balances[_to].add(_value);
+    _burn(this, _value);
+    _mint(_to, _value);
     emit Transfer(this, _to, _value);
     return true;
   }
   
   function transferFrom(address _from, address _to, uint256 _value) returns (bool) {
     require(allowedControllers[msg.sender] == true);
-    require(_value <= balances[_from]);
+    require(_value <= balanceOf(_from));
     require(_to != address(0));
 
-    balances[_from] = balances[_from].sub(_value);
-    balances[_to] = balances[_to].add(_value);
+    _burn(_from, _value);
+    _mint(_to, _value);
     emit Transfer(_from, _to, _value);
     return true;
   }
   
   function transfer(address _to, uint256 _value) public returns (bool) {
     require(allowedControllers[msg.sender] == true);
-    require(_value <= balances[msg.sender]);
+    require(_value <= balanceOf(msg.sender));
     require(_to != address(0));
 
-    balances[msg.sender] = balances[msg.sender].sub(_value);
-    balances[_to] = balances[_to].add(_value);
+    _burn(msg.sender, _value);
+    _mint(_to, _value);
     emit Transfer(msg.sender, _to, _value);
     return true;
   }
