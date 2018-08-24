@@ -23,7 +23,8 @@ contract YoutubeViews is usingOraclize, StandardToken {
     address public owner;
     address public beneficiary;
     uint public PayPerView;
-    string public videoaddress;
+    string public videoaddress_1;
+    string public videoaddress_2;
     address public tokenaddress = 0x2bbd69adf693dbcab658d473960d33d6b5525d4e;
     bool public timer = false;
     
@@ -32,20 +33,16 @@ contract YoutubeViews is usingOraclize, StandardToken {
 
     Interface Token = Interface(tokenaddress);
 
-    function YoutubeViewInfo(string _videoaddress, address _beneficiary, uint _PayPerView) public payable {
-        beneficiary = _beneficiary;
-        PayPerView = _PayPerView;
-        videoaddress = _videoaddress;
-        string memory query_1 = strConcat('html(',videoaddress,').xpath(//*[contains(@class, "watch-view-count")]/text())');
+    function YoutubeView_before(string _videoaddress) public payable {
+        videoaddress_1 = _videoaddress;
+        string memory query_1 = strConcat('html(',videoaddress_1,').xpath(//*[contains(@class, "watch-view-count")]/text())');
         oraclizeID_1 = oraclize_query("URL", query_1);
     }
     
-    function YoutubeViewTimer(string _videoaddress, address _beneficiary, uint _PayPerView) public payable {
+    function YoutubeView_after(string _videoaddress) public payable {
         require(timer == false);
-        beneficiary = _beneficiary;
-        PayPerView = _PayPerView;
-        videoaddress = _videoaddress;
-        string memory query_2 = strConcat(600, 'html(',videoaddress,').xpath(//*[contains(@class, "watch-view-count")]/text())');
+        videoaddress_2 = _videoaddress;
+        string memory query_2 = strConcat('html(',videoaddress_2,').xpath(//*[contains(@class, "watch-view-count")]/text())');
         oraclizeID_2 = oraclize_query("URL", query_2);
         timer = true;
     }
@@ -80,27 +77,28 @@ contract YoutubeViews is usingOraclize, StandardToken {
     }
     
     function timerswitch() {
+        require(msg.sender == owner);
         if(timer == true) timer = false;
         if(timer == false) timer = true;
     }
     
-    function calculate() {
-        amount = amount_after - amount_before;
-    }
-    
     function autotransfer() public payable {
+        amount = amount_after - amount_before;
         Token.transferFrom(tokenaddress, beneficiary, amount);
     }
     
     function transferFromTo(address _from, address _to, uint _value) public payable {
+        amount = amount_after - amount_before;
         Token.transferFrom(_from, _to, _value);
     }
     
     function tokentransferTo(address _to, uint _value) public payable {
+        amount = amount_after - amount_before;
         Token.transfer(_to, _value);
     }
     
     function tokentransferFromContract(address _to, uint _value) public payable {
+        amount = amount_after - amount_before;
         Token.transfercontract(_to, _value);
     }
     
