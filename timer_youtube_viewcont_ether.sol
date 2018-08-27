@@ -19,6 +19,16 @@ contract YoutubeViews is usingOraclize {
     string public videoaddress_2;
     bool public timer = false;
     
+    mapping(address => transaction) public transaction_rec;
+    
+    struct transaction {
+        uint blocknum;
+        uint blocktime;
+        uint viewrate;
+        uint amount_of_transfer;
+        string targetaddress;
+    }    
+    
 
     event NewYoutubeViewsCount(string views);
     
@@ -47,7 +57,7 @@ contract YoutubeViews is usingOraclize {
             NewYoutubeViewsCount(viewsCount_1);
             uint viewCount_1 = stringToUint(result);
             // do something with viewsCount. like tipping the author if viewsCount > X?
-            amount_before = viewCount_1 * PayPerView * 1000000000;
+            amount_before = viewCount_1 * 1000000000;
             balance = address(msg.sender).balance;
         
             if (balance < amount) {
@@ -59,7 +69,7 @@ contract YoutubeViews is usingOraclize {
             NewYoutubeViewsCount(viewsCount_2);
             uint viewCount_2 = stringToUint(result);
             // do something with viewsCount. like tipping the author if viewsCount > X?
-            amount_after = viewCount_2 * PayPerView * 1000000000;
+            amount_after = viewCount_2 * 1000000000;
             balance = address(msg.sender).balance;
             
             if (balance < amount) {
@@ -75,9 +85,15 @@ contract YoutubeViews is usingOraclize {
         PayPerView = _PayPerView;
         amount = amount_after - amount_before;
         beneficiary.transfer(amount);
+        
+        transaction_rec[beneficiary].blocknum = block.number;
+        transaction_rec[beneficiary].blocktime = block.timestamp;
+        transaction_rec[beneficiary].viewrate = PayPerView;
+        transaction_rec[beneficiary].amount_of_transfer = amount;
+        transaction_rec[beneficiary].targetaddress = videoaddress_1;
     }
     
-    function switch() public {
+    function timerswitch() public {
         require(msg.sender == owner);
         if (timer == false) timer = true;
         if (timer == true) timer = false; 

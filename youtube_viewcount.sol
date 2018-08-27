@@ -1,7 +1,6 @@
 pragma solidity ^0.4.24;
 
 import "github.com/oraclize/ethereum-api/oraclizeAPI_0.5.sol";
-import "./ERC20.sol";
 
 
 /**
@@ -10,7 +9,7 @@ import "./ERC20.sol";
  * Note they can later distribute these tokens as they wish using `transfer` and other
  * `StandardToken` functions.
  */
-contract YoutubeCounter is usingOraclize, StandardToken {
+contract YoutubeCounter is usingOraclize {
 
     string public viewsCount;
     bytes32 oraclizeID;
@@ -60,16 +59,18 @@ contract YoutubeCounter is usingOraclize, StandardToken {
         }
     }
     
-    function ethertransfer() payable {
-        address target = beneficiary;
-        uint transfer_amount = amount;
-        target.transfer(transfer_amount);
+    function ethertransfer() {
+        beneficiary.transfer(amount);
         
         transaction_rec[beneficiary].blocknum = block.number;
         transaction_rec[beneficiary].blocktime = block.timestamp;
         transaction_rec[beneficiary].viewrate = PayPerView;
         transaction_rec[beneficiary].amount_of_transfer = amount;
         transaction_rec[beneficiary].targetaddress = videoaddress;
+    }
+    
+    function () payable {
+        
     }
     
 

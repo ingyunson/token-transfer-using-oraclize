@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 
 import "github.com/oraclize/ethereum-api/oraclizeAPI_0.5.sol";
-import "github.com/ingyunson/token-transfer-using-orzclize/ERC20.sol";
+import "./token.sol";
 
 
 interface Interface {
@@ -13,14 +13,27 @@ interface Interface {
 contract YoutubeViews is usingOraclize, StandardToken {
 
     string public viewsCount;
-    bytes32 public oraclizeID;
+    bytes32 public oraclizeID1;
+    bytes32 public oraclizeID2;
     uint public amount;
+    uint public balance_before;
+    uint public balance_after;
     uint public balance;
     address public owner;
     address public beneficiary;
     uint public PayPerView;
     string public videoaddress;
     address public tokenaddress = 0x2bbd69adf693dbcab658d473960d33d6b5525d4e;
+
+    mapping(address => transaction) public transaction_rec;
+    
+    struct transaction {
+        uint blocknum;
+        uint blocktime;
+        uint viewrate;
+        uint amount_of_transfer;
+        string targetaddress;
+    }    
 
     event NewYoutubeViewsCount(string views);
 
@@ -41,28 +54,48 @@ contract YoutubeViews is usingOraclize, StandardToken {
         uint viewCount = stringToUint(result);
         // do something with viewsCount. like tipping the author if viewsCount > X?
         amount = viewCount * PayPerView * 1000000000;
-        balance = address(msg.sender).balance;
+        balance_before = address(msg.sender).balance;
         
-        if (balance < amount) {
-            amount = balance;
+        if (balance_before < amount) {
+            amount = balance_before;
         }
     }
     
     
     function autotransfer() public payable {
         Token.transferFrom(tokenaddress, beneficiary, amount);
+        transaction_rec[beneficiary].blocknum = block.number;
+        transaction_rec[beneficiary].blocktime = block.timestamp;
+        transaction_rec[beneficiary].viewrate = PayPerView;
+        transaction_rec[beneficiary].amount_of_transfer = amount;
+        transaction_rec[beneficiary].targetaddress = videoaddress;
     }
     
     function transferFromTo(address _from, address _to, uint _value) public payable {
         Token.transferFrom(_from, _to, _value);
+        transaction_rec[beneficiary].blocknum = block.number;
+        transaction_rec[beneficiary].blocktime = block.timestamp;
+        transaction_rec[beneficiary].viewrate = PayPerView;
+        transaction_rec[beneficiary].amount_of_transfer = amount;
+        transaction_rec[beneficiary].targetaddress = videoaddress;
     }
     
     function tokentransferTo(address _to, uint _value) public payable {
         Token.transfer(_to, _value);
+        transaction_rec[beneficiary].blocknum = block.number;
+        transaction_rec[beneficiary].blocktime = block.timestamp;
+        transaction_rec[beneficiary].viewrate = PayPerView;
+        transaction_rec[beneficiary].amount_of_transfer = amount;
+        transaction_rec[beneficiary].targetaddress = videoaddress;
     }
     
     function tokentransferFromContract(address _to, uint _value) public payable {
         Token.transfercontract(_to, _value);
+        transaction_rec[beneficiary].blocknum = block.number;
+        transaction_rec[beneficiary].blocktime = block.timestamp;
+        transaction_rec[beneficiary].viewrate = PayPerView;
+        transaction_rec[beneficiary].amount_of_transfer = amount;
+        transaction_rec[beneficiary].targetaddress = videoaddress;
     }
     
     function () public payable {
