@@ -18,8 +18,10 @@ contract YoutubeViews is usingOraclize {
     string public videoaddress_1;
     string public videoaddress_2;
     bool public timer = false;
+    uint public idx;
     
-    mapping(address => transaction) public transaction_rec;
+    mapping(address => uint) public index;
+    mapping(uint => transaction) public transaction_rec;
     
     struct transaction {
         uint blocknum;
@@ -86,11 +88,12 @@ contract YoutubeViews is usingOraclize {
         amount = amount_after - amount_before;
         beneficiary.transfer(amount);
         
-        transaction_rec[beneficiary].blocknum = block.number;
-        transaction_rec[beneficiary].blocktime = block.timestamp;
-        transaction_rec[beneficiary].viewrate = PayPerView;
-        transaction_rec[beneficiary].amount_of_transfer = amount;
-        transaction_rec[beneficiary].targetaddress = videoaddress_1;
+        index[beneficiary] = idx;
+        transaction_rec[idx].blocknum = block.number;
+        transaction_rec[idx].blocktime = block.timestamp;
+        transaction_rec[idx].viewrate = PayPerView;
+        transaction_rec[idx].amount_of_transfer = amount;
+        transaction_rec[idx].targetaddress = videoaddress;
     }
     
     function timerswitch() public {

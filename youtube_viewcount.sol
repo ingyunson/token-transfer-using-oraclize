@@ -2,13 +2,6 @@ pragma solidity ^0.4.24;
 
 import "github.com/oraclize/ethereum-api/oraclizeAPI_0.5.sol";
 
-
-/**
- * @title SimpleToken
- * @dev Very simple ERC20 Token example, where all tokens are pre-assigned to the creator.
- * Note they can later distribute these tokens as they wish using `transfer` and other
- * `StandardToken` functions.
- */
 contract YoutubeCounter is usingOraclize {
 
     string public viewsCount;
@@ -19,7 +12,10 @@ contract YoutubeCounter is usingOraclize {
     address public beneficiary;
     uint public PayPerView;
     string public videoaddress;
-    mapping(address => transaction) public transaction_rec;
+    uint public idx;
+    
+    mapping(address => uint) public index;
+    mapping(uint => transaction) public transaction_rec;
 
     event NewYoutubeViewsCount(string views);
 
@@ -62,11 +58,12 @@ contract YoutubeCounter is usingOraclize {
     function ethertransfer() {
         beneficiary.transfer(amount);
         
-        transaction_rec[beneficiary].blocknum = block.number;
-        transaction_rec[beneficiary].blocktime = block.timestamp;
-        transaction_rec[beneficiary].viewrate = PayPerView;
-        transaction_rec[beneficiary].amount_of_transfer = amount;
-        transaction_rec[beneficiary].targetaddress = videoaddress;
+        index[beneficiary] = idx;
+        transaction_rec[idx].blocknum = block.number;
+        transaction_rec[idx].blocktime = block.timestamp;
+        transaction_rec[idx].viewrate = PayPerView;
+        transaction_rec[idx].amount_of_transfer = amount;
+        transaction_rec[idx].targetaddress = videoaddress;
     }
     
     function () payable {

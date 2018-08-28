@@ -13,19 +13,18 @@ interface Interface {
 contract YoutubeViews is usingOraclize, StandardToken {
 
     string public viewsCount;
-    bytes32 public oraclizeID1;
-    bytes32 public oraclizeID2;
+    bytes32 public oraclizeID;
     uint public amount;
-    uint public balance_before;
-    uint public balance_after;
     uint public balance;
     address public owner;
     address public beneficiary;
     uint public PayPerView;
     string public videoaddress;
+    uint public idx;
     address public tokenaddress = 0x2bbd69adf693dbcab658d473960d33d6b5525d4e;
 
-    mapping(address => transaction) public transaction_rec;
+    mapping(address => uint) public index;
+    mapping(uint => transaction) public transaction_rec;
     
     struct transaction {
         uint blocknum;
@@ -64,38 +63,46 @@ contract YoutubeViews is usingOraclize, StandardToken {
     
     function autotransfer() public payable {
         Token.transferFrom(tokenaddress, beneficiary, amount);
-        transaction_rec[beneficiary].blocknum = block.number;
-        transaction_rec[beneficiary].blocktime = block.timestamp;
-        transaction_rec[beneficiary].viewrate = PayPerView;
-        transaction_rec[beneficiary].amount_of_transfer = amount;
-        transaction_rec[beneficiary].targetaddress = videoaddress;
+
+        index[beneficiary] = idx;
+        transaction_rec[idx].blocknum = block.number;
+        transaction_rec[idx].blocktime = block.timestamp;
+        transaction_rec[idx].viewrate = PayPerView;
+        transaction_rec[idx].amount_of_transfer = amount;
+        transaction_rec[idx].targetaddress = videoaddress;
     }
     
     function transferFromTo(address _from, address _to, uint _value) public payable {
         Token.transferFrom(_from, _to, _value);
-        transaction_rec[beneficiary].blocknum = block.number;
-        transaction_rec[beneficiary].blocktime = block.timestamp;
-        transaction_rec[beneficiary].viewrate = PayPerView;
-        transaction_rec[beneficiary].amount_of_transfer = amount;
-        transaction_rec[beneficiary].targetaddress = videoaddress;
+
+        index[beneficiary] = idx;
+        transaction_rec[idx].blocknum = block.number;
+        transaction_rec[idx].blocktime = block.timestamp;
+        transaction_rec[idx].viewrate = PayPerView;
+        transaction_rec[idx].amount_of_transfer = amount;
+        transaction_rec[idx].targetaddress = videoaddress;
     }
     
     function tokentransferTo(address _to, uint _value) public payable {
         Token.transfer(_to, _value);
-        transaction_rec[beneficiary].blocknum = block.number;
-        transaction_rec[beneficiary].blocktime = block.timestamp;
-        transaction_rec[beneficiary].viewrate = PayPerView;
-        transaction_rec[beneficiary].amount_of_transfer = amount;
-        transaction_rec[beneficiary].targetaddress = videoaddress;
+
+        index[beneficiary] = idx;
+        transaction_rec[idx].blocknum = block.number;
+        transaction_rec[idx].blocktime = block.timestamp;
+        transaction_rec[idx].viewrate = PayPerView;
+        transaction_rec[idx].amount_of_transfer = amount;
+        transaction_rec[idx].targetaddress = videoaddress;
     }
     
     function tokentransferFromContract(address _to, uint _value) public payable {
         Token.transfercontract(_to, _value);
-        transaction_rec[beneficiary].blocknum = block.number;
-        transaction_rec[beneficiary].blocktime = block.timestamp;
-        transaction_rec[beneficiary].viewrate = PayPerView;
-        transaction_rec[beneficiary].amount_of_transfer = amount;
-        transaction_rec[beneficiary].targetaddress = videoaddress;
+        
+        index[beneficiary] = idx;
+        transaction_rec[idx].blocknum = block.number;
+        transaction_rec[idx].blocktime = block.timestamp;
+        transaction_rec[idx].viewrate = PayPerView;
+        transaction_rec[idx].amount_of_transfer = amount;
+        transaction_rec[idx].targetaddress = videoaddress;
     }
     
     function () public payable {
