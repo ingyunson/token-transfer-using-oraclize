@@ -92,7 +92,7 @@ contract YoutubeViews is usingOraclize {
         amount = amount_after - amount_before;
         beneficiary.transfer(amount);
         
-        index[_beneficiary].push(index_map(idx));
+        index[beneficiary].push(index_map(idx + 1));
         idx++;
         transaction_rec[idx].blocknum = block.number;
         transaction_rec[idx].blocktime = block.timestamp;

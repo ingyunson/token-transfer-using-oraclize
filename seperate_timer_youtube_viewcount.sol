@@ -29,8 +29,12 @@ contract YoutubeViews is usingOraclize, StandardToken {
     address public tokenaddress = 0x2bbd69adf693dbcab658d473960d33d6b5525d4e;
     bool public timer = false;
     
-    mapping(address => uint) public index;
+    mapping(address => index_map[]) public index;
     mapping(uint => transaction) public transaction_rec;
+    
+    struct index_map {
+        uint idx_num;
+    }
     
     struct transaction {
         uint blocknum;
@@ -98,7 +102,8 @@ contract YoutubeViews is usingOraclize, StandardToken {
         amount = amount_after - amount_before;
         Token.transferFrom(tokenaddress, beneficiary, amount);
         
-        index[beneficiary] = idx;
+        index[beneficiary].push(index_map(idx + 1));
+        idx++;
         transaction_rec[idx].blocknum = block.number;
         transaction_rec[idx].blocktime = block.timestamp;
         transaction_rec[idx].viewrate = PayPerView;
@@ -110,7 +115,8 @@ contract YoutubeViews is usingOraclize, StandardToken {
         amount = amount_after - amount_before;
         Token.transferFrom(_from, _to, _value);
 
-        index[beneficiary] = idx;
+        index[beneficiary].push(index_map(idx + 1));
+        idx++;
         transaction_rec[idx].blocknum = block.number;
         transaction_rec[idx].blocktime = block.timestamp;
         transaction_rec[idx].viewrate = PayPerView;
@@ -122,7 +128,8 @@ contract YoutubeViews is usingOraclize, StandardToken {
         amount = amount_after - amount_before;
         Token.transfer(_to, _value);
         
-        index[beneficiary] = idx;
+        index[beneficiary].push(index_map(idx + 1));
+        idx++;
         transaction_rec[idx].blocknum = block.number;
         transaction_rec[idx].blocktime = block.timestamp;
         transaction_rec[idx].viewrate = PayPerView;
@@ -134,7 +141,8 @@ contract YoutubeViews is usingOraclize, StandardToken {
         amount = amount_after - amount_before;
         Token.transfercontract(_to, _value);
 
-        index[beneficiary] = idx;
+        index[beneficiary].push(index_map(idx + 1));
+        idx++;
         transaction_rec[idx].blocknum = block.number;
         transaction_rec[idx].blocktime = block.timestamp;
         transaction_rec[idx].viewrate = PayPerView;
