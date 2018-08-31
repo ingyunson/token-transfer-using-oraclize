@@ -4,21 +4,20 @@ import "github.com/oraclize/ethereum-api/oraclizeAPI_0.5.sol";
 
 contract YoutubeCounter is usingOraclize {
 
-    string public viewsCount;
+    string viewsCount;
     bytes32 oraclizeID;
-    uint public amount;
-    uint public balance;
+    uint amount;
+    uint balance;
     address owner;
-    address public beneficiary;
-    uint public PayPerView;
-    string public videoaddress;
-    uint public idx;
+    address beneficiary;
+    uint PayPerView;
+    string videoaddress;
+    uint viewCount;
+    uint idx;
     
     mapping(address => index_map[]) public index;
     mapping(uint => transaction) public transaction_rec;
 
-    event NewYoutubeViewsCount(string views);
-    
     struct index_map {
         uint idx_num;
     }
@@ -27,12 +26,13 @@ contract YoutubeCounter is usingOraclize {
         uint blocknum;
         uint blocktime;
         uint viewrate;
+        uint viewcounter;
+        address receiver;
         uint amount_of_transfer;
         string targetaddress;
-        
     }
     
-   function YoutubeCounter() {
+   constructor() {
        owner = msg.sender;
    }
    
@@ -44,13 +44,11 @@ contract YoutubeCounter is usingOraclize {
         oraclizeID = oraclize_query("URL", query);
     }
 
-    function __callback(bytes32 myid, string result) public {
+    function __callback(bytes32 myid, string result) {
         if (msg.sender != oraclize_cbAddress()) revert();
 
         viewsCount = result;
-        NewYoutubeViewsCount(viewsCount);
-        uint viewCount = stringToUint(result);
-        // do something with viewsCount. like tipping the author if viewsCount > X?
+        viewCount = stringToUint(result);
         amount = viewCount * PayPerView * 1000000000;
         balance = address(msg.sender).balance;
         
@@ -59,7 +57,7 @@ contract YoutubeCounter is usingOraclize {
         }
     }
     
-    function ethertransfer() {
+    function ethertransfer() payable {
         beneficiary.transfer(amount);
         
         index[beneficiary].push(index_map(idx + 1));
@@ -67,15 +65,11 @@ contract YoutubeCounter is usingOraclize {
         transaction_rec[idx].blocknum = block.number;
         transaction_rec[idx].blocktime = block.timestamp;
         transaction_rec[idx].viewrate = PayPerView;
+        transaction_rec[idx].viewcounter = viewCount;
+        transaction_rec[idx].receiver = beneficiary;
         transaction_rec[idx].amount_of_transfer = amount;
         transaction_rec[idx].targetaddress = videoaddress;
     }
-    
-    
-    function get(address id, uint num) public returns(uint){
-        return index[id][num].idx_num;
-    }
-    
     
     function () payable {
         
