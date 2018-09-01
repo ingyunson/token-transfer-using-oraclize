@@ -4,21 +4,22 @@ import "github.com/oraclize/ethereum-api/oraclizeAPI_0.5.sol";
 
 contract YoutubeViews is usingOraclize {
 
-    string public viewsCount_1;
-    string public viewsCount_2;
-    bytes32 public oraclizeID_1;
-    bytes32 public oraclizeID_2;
-    uint public amount;
-    uint public amount_before;
-    uint public amount_after;
-    uint public balance;
-    address public owner;
-    address public beneficiary;
-    uint public PayPerView;
-    string public videoaddress_1;
-    string public videoaddress_2;
+    string viewsCount_1;
+    string viewsCount_2;
+    bytes32 oraclizeID_1;
+    bytes32 oraclizeID_2;
+    uint amount;
+    uint amount_before;
+    uint amount_after;
+    uint balance;
+    address owner;
+    address beneficiary;
+    uint PayPerView;
+    string videoaddress;
     bool public timer = false;
-    uint public idx;
+    uint viewCount_1;
+    uint viewCount_2;
+    uint idx;
     
     mapping(address => index_map[]) public index;
     mapping(uint => transaction) public transaction_rec;
@@ -26,70 +27,67 @@ contract YoutubeViews is usingOraclize {
     struct index_map {
         uint idx_num;
     }
-    
+
     struct transaction {
         uint blocknum;
         uint blocktime;
         uint viewrate;
+        uint viewcounter;
+        address receiver;
         uint amount_of_transfer;
         string targetaddress;
-    }    
+    } 
     
-
-    event NewYoutubeViewsCount(string views);
-    
-  constructor() public payable {
+  constructor()  {
     owner = msg.sender;
     }
 
-    function YoutubeView_before(string _videoaddress) public payable {
-        videoaddress_1 = _videoaddress;
-        string memory query_1 = strConcat('html(',videoaddress_1,').xpath(//*[contains(@class, "watch-view-count")]/text())');
+    function YoutubeView_setup(string _videoaddress, address _beneficiary, uint _PayPerView) public payable {
+        videoaddress = _videoaddress;
+        beneficiary = _beneficiary;
+        PayPerView = _PayPerView;
+        string memory query_1 = strConcat('html(',videoaddress,').xpath(//*[contains(@class, "watch-view-count")]/text())');
         oraclizeID_1 = oraclize_query("URL", query_1);
+        timer = false;
     }
-    
-    function YoutubeView_after(string _videoaddress) public payable {
+    function YoutubeView_timer() public payable {
         require(timer == false);
-        videoaddress_2 = _videoaddress;
-        string memory query_2 = strConcat('html(',videoaddress_2,').xpath(//*[contains(@class, "watch-view-count")]/text())');
-        oraclizeID_2 = oraclize_query("URL", query_2);
+        string memory query_2 = strConcat('html(',videoaddress,').xpath(//*[contains(@class, "watch-view-count")]/text())');
+        oraclizeID_2 = oraclize_query(120, "URL", query_2);
         timer = true;
     }
 
-    function __callback(bytes32 myid, string result) public {
+    function __callback(bytes32 myid, string result) {
         if (msg.sender != oraclize_cbAddress()) revert();
-        if(timer == false) {
+        if (timer == false) {
             viewsCount_1 = result;
-            NewYoutubeViewsCount(viewsCount_1);
-            uint viewCount_1 = stringToUint(result);
+            viewCount_1 = stringToUint(result);
             // do something with viewsCount. like tipping the author if viewsCount > X?
-            amount_before = viewCount_1 * 1000000000;
+            amount_before = viewCount_1 * PayPerView * 1000000000;
             balance = address(msg.sender).balance;
         
             if (balance < amount) {
                 amount = balance;
             }
-        }
-        if (timer == true) {
+        
+        } if (timer == true) {
             viewsCount_2 = result;
-            NewYoutubeViewsCount(viewsCount_2);
-            uint viewCount_2 = stringToUint(result);
+            viewCount_2 = stringToUint(result);
             // do something with viewsCount. like tipping the author if viewsCount > X?
-            amount_after = viewCount_2 * 1000000000;
+            amount_after = viewCount_2 * PayPerView * 1000000000;
             balance = address(msg.sender).balance;
+            timer = false;
+            amount = amount_after - amount_before;
             
             if (balance < amount) {
                 amount = balance;
             }
-             
+                   
         }
+        
     }
-
     
-    function ethertransfer(address _beneficiary, uint _PayPerView) {
-        beneficiary = _beneficiary;
-        PayPerView = _PayPerView;
-        amount = amount_after - amount_before;
+    function ethertransfer() {
         beneficiary.transfer(amount);
         
         index[beneficiary].push(index_map(idx + 1));
@@ -97,22 +95,30 @@ contract YoutubeViews is usingOraclize {
         transaction_rec[idx].blocknum = block.number;
         transaction_rec[idx].blocktime = block.timestamp;
         transaction_rec[idx].viewrate = PayPerView;
+        transaction_rec[idx].viewcounter = viewCount_2 - viewCount_1;
+        transaction_rec[idx].receiver = beneficiary;
         transaction_rec[idx].amount_of_transfer = amount;
-        transaction_rec[idx].targetaddress = videoaddress_1;
+        transaction_rec[idx].targetaddress = videoaddress;
     }
     
-    function timerswitch() public {
+    function timerswitch() {
         require(msg.sender == owner);
         if (timer == false) timer = true;
         if (timer == true) timer = false; 
     }
     
-    function () public payable {
+    function () private {
 
     }
     
-
-
+    function refund() public {
+        require(msg.sender == owner);
+        
+        uint balance = address(this).balance;
+        if (balance > 0) {
+            owner.transfer(balance);
+        }
+    }
 
     function stringToUint(string s) internal pure returns (uint result) {
         bytes memory b = bytes(s);
