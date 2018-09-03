@@ -2,7 +2,8 @@
 
 # token-transfer-using-orzclize
 
-[日本語版](./README_jp.md).
+[日本語版](./README_jp.md)
+[English version](./README_eng.md)
   
 [Oraclize](https://github.com/oraclize/ethereum-api)를 이용하여 토큰 전송을 하는 스마트 컨트랙트입니다.
 하나의 토큰 컨트랙트와 네 가지의 유튜브 카운터를 이용한 컨트랙트가 있습니다.
@@ -11,7 +12,7 @@
 - `youtube_viewcount.sol` 유튜브 영상 조회수에 따른 이더 지급용 컨트랙트입니다.
 - `timer_youtube_viewcount.sol` 유튜브 영상 조회수에 따른 이더 지급용 컨트랙트입니다. 컨트랙트 생성 후 일정 시간 뒤에 다시 조회수를 측정하여 설정된 시간동안 조회된 영상 조회수만큼 이더를 지급합니다.
 - `token_youtube_viewcount.sol` 유튜브 영상 조회수에 해당하는 수량의 ERC20.sol을 통해 생성된 토큰을 지급하는 컨트랙트입니다.
-- `token_timer_youtube_viewcount.sol` 유튜브 영상 조회수에 따른 토큰 지급용 컨트랙트입니다. 컨트랙트 생성 후 일정 시간 뒤에 다시 조회수를 측정하여 설정된 시간동안 조회된 영상 조회수만큼 이더를 지급합니다.
+- `token_timer_youtube_viewcount.sol` 유튜브 영상 조회수에 따른 토큰 지급용 컨트랙트입니다. 컨트랙트 생성 후 일정 시간 뒤에 다시 조회수를 측정하여 설정된 시간동안 조회된 영상 조회수만큼 토큰을 지급합니다.
 
 ## 사용 예시
 유튜브 조회수를 기준으로 한 스마트 컨트랙트를 배포할 수 있습니다. 유튜브 동영상 광고나 MCN 사업 등에 응용할 수 있습니다.
@@ -57,7 +58,7 @@
 - 컨트랙트 배포자를 owner로 설정합니다.
 
 `YoutubeViews` 유튜브 영상 정보
-- 매개 함수를 이용하여 컨트랙트를 진행할 영상 정보, 수취자, 조회수 당 비율을 설정할 수 있습니다.
+- 매개 변수를 이용하여 컨트랙트를 진행할 영상 정보, 수취자, 조회수 당 비율을 설정할 수 있습니다.
 - _videoaddress : 타겟 유튜브 주소(string)
 - _beneficiary : 수취자 주소(address)
  - _PayPerView : 조회수 당 전송 이더 비율(uint)
@@ -72,7 +73,7 @@
 
 ----
 ----
-## 2. 타이머가 있는 유튜브 조회수에 다른 이더 지급 컨트랙트
+## 2. 타이머가 있는 유튜브 조회수에 따른 이더 지급 컨트랙트
 
 파일명 : `timer_youtube_viewcount.sol`
 
@@ -170,7 +171,7 @@
 - `amount `: 전송할 wei
 - `balance` : 계정의 잔고
 - `beneficiary` : 수취자 주소
-- `PayPerView` : 조휘수 당 전송 비율
+- `PayPerView` : 조회수 당 전송 비율
 - `videoaddress` : 타겟 유튜브 주소
 - `tokenaddress` : 컨트롤할 토큰의 스마트 계약 주소
 ----
