@@ -102,7 +102,6 @@ In this method, `viewcounter` and `amount_of_transfer` in struct `transaction` b
 Filename : `ERC20.sol`  and  `seperated_youtube_viewcount.sol`
 
 Contract for transfer token not ether. Make and control token using `ERC20.sol` and transfer token by youtube viewcount using `seperated_youtube_viewcount.sol`
-이더가 아닌 별도로 발행한 토큰을 전송시키는 컨트랙트입니다. `ERC20.sol`을 이용하여 토큰을 만들고, 이 토큰의 컨트랙트 주소를 이용하여 `seperated_youtube_viewcount.sol`을 통해 토큰을 컨트롤합니다.
 
 #### ※ You need some ether in the youtube viewcount contract address to using Oraclize.
 ------------
