@@ -2,7 +2,7 @@
 
 # token-transfer-using-orzclize
 
-[日本語版](./README_jp.md)
+[日本語版](./README_jp.md)  
 [English version](./README_eng.md)
   
 [Oraclize](https://github.com/oraclize/ethereum-api)를 이용하여 토큰 전송을 하는 스마트 컨트랙트입니다.
