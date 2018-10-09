@@ -25,6 +25,8 @@ contract YoutubeCounter is usingOraclize {
     mapping(address => index_map[]) public index;
     mapping(uint => transaction) public transaction_rec;
 
+    event transfer(uint blockinfo_num, uint blockinfo_time, uint viewrate, uint viewcounter, address receiver, uint amount, string url);
+
     struct index_map {
         uint idx_num;
     }
@@ -66,6 +68,7 @@ contract YoutubeCounter is usingOraclize {
     
     function ethertransfer() payable {
         beneficiary.transfer(amount);
+        emit transfer(block.number, block.timestamp, PayPerView, viewCount, beneficiary, amount, videoaddress);
         
         index[beneficiary].push(index_map(idx + 1));
         idx++;
