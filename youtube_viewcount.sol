@@ -67,6 +67,7 @@ contract YoutubeCounter is usingOraclize {
     }
     
     function ethertransfer() payable {
+        require(address(msg.sender).balance >= amount);
         beneficiary.transfer(amount);
         emit transfer(block.number, block.timestamp, PayPerView, viewCount, beneficiary, amount, videoaddress);
         

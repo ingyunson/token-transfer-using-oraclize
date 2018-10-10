@@ -97,6 +97,7 @@ contract YoutubeViews is usingOraclize {
     }
     
     function ethertransfer() {
+        require(address(msg.sender).balance >= amount);
         beneficiary.transfer(amount);
         emit transfer(block.number, block.timestamp, PayPerView, viewCount, beneficiary, amount, videoaddress);
         
